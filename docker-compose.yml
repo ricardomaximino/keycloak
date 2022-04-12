@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # mysql:
+  #   image: mysql:5.7
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root
+  #     MYSQL_DATABASE: keycloak
+  #     MYSQL_USER: keycloak
+  #     MYSQL_PASSWORD: password
+
+  keycloak:
+    image: brasatech/keycloak:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: keycloak
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      # - X509_CA_BUNDLE: /etc/x509/https/rootCA.crt
+      # - KC_HOSTNAME=localhost:8443
+      # - KC_DB_URL=mysql
+      # - KC_DB_PORT=3306
+      # - KC_DB_DATABASE=keycloak
+      # - KC_DB_USER=keycloak
+      # - KC_DB_PASSWORD=password
+
+    command: start-dev
+    # command: start --https-certificate-file=/etc/x509/https/tls.crt --https-certificate-key-file=/certs/brasatech-server.key:/etc/x509/https/tls.key
+    # command: start --hostname=localhost --hostname-port=9090
+  
+    ports:
+      - 8080:8080
+      - 9443:8443
+    volumes:
+      - ./certs/brasatech-server.pem:/etc/x509/https/tls.crt
+      - ./certs/brasatech-server.key:/etc/x509/https/tls.key
+      # - ./certs/brasatech-root.cer:/etc/x509/https/rootCA.crt
+#     depends_on:
+#         - mysql
+
+# volumes:
+#   mysql_data:
+#     name: mysql_data

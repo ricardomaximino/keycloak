@@ -1,0 +1,24 @@
+# Keycloak repository
+https://github.com/keycloak/keycloak
+
+# Keycloak containers repository
+https://github.com/keycloak/keycloak-containers
+
+# HTTPS and login with certificate
+https://www.youtube.com/watch?v=yq1hzNs1JQU
+
+# Create certificates with Keytool
+https://stackoverflow.com/questions/35947354/how-to-create-a-certificate-with-keytool
+
+# http
+http://localhost:9090/
+
+
+# [GMAIL configuration](https://dev.to/rounakcodes/keycloak-configure-realm-email-settings-gmail-3dfn)
+Host: smtp.gmail.com
+Port: 587 (for SSL, use 465)
+From: admin-email-address
+Enable StartTLS: On (for SSL, use Enable SSL)
+Enable Authentication: On
+Username: username
+Password: password
