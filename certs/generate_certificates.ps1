@@ -24,7 +24,8 @@ $ca_state="Alicante"
 $ca_country="ES"
 
 # Server Organizational Information #
-$server_dns="localhost"
+# Subject Alternative Name #
+$serverDNS="localhost"
 $server_organizationalUnit="BrasaTech IT"
 $server_organization="BrasaTech Digital Solutions"
 $server_locality="Santa Pola"
@@ -43,9 +44,6 @@ $authorityAlias="brasatech-root"
 $serverAlias="brasatech-server"
 $clientAlias="brasatech-client"
 
-# Subject Alternative Name #
-$serverDNS="$serverAlias"
-
 # Extensions #
 $certAuthExtension="BasicConstraints:critical=ca:true,pathlen:10000"
 $altNameExtension="san=dns:$serverDNS"
@@ -56,6 +54,7 @@ $trustCertName="truststore"
 # Key size and effective period #
 $keySize="4096"
 $validity="365"
+$storeType="PKCS12"
 
 # Key and Store Password #
 $certPassword="changeit"
@@ -65,7 +64,7 @@ $certPassword="changeit"
 # ------------------------------------------------------------------------------------------ #
 
 $authorityDN="CN=$authorityAlias,OU=$ca_organizationalUnit,O=$ca_organization,L=$ca_locality,ST=$ca_state,C=$ca_country"
-$serverDN="CN=$server_dns,OU=$server_organizationalUnit,O=$server_organization,L=$server_locality,ST=$server_state,C=$server_country"
+$serverDN="CN=$serverDNS,OU=$server_organizationalUnit,O=$server_organization,L=$server_locality,ST=$server_state,C=$server_country"
 $clientDN="CN=$clientAlias,OU=$client_organizationalUnit,O=$client_organization,L=$client_locality,ST=$client_state,C=$client_country"
 
 rm "$authorityAlias.*"
@@ -77,7 +76,7 @@ rm "$truststore.*"
 echo ""
 echo "Generating the Root Authority Certificate..."
 keytool -genkeypair -alias "$authorityAlias" -keyalg RSA -dname "$authorityDN" -ext "$certAuthExtension" `
-    -validity "$validity" -keysize "$keySize" -keystore "$authorityAlias.p12" -keypass "$certPassword" `
+    -validity "$validity" -keysize "$keySize" -storetype "$storeType" -keystore "$authorityAlias.p12" -keypass "$certPassword" `
     -storepass "$certPassword" -deststoretype pkcs12
 
 echo "- Exporting Root Authority Certificate Public Key..."
@@ -89,7 +88,7 @@ echo ""
 echo "Generating the Server Certificate..."
 echo "- Creating Key Pair"
 keytool -genkey -validity "$validity" -keysize "$keySize" -alias "$serverAlias" -keyalg RSA -dname "$serverDN" `
-    -ext "$altNameExtension" -keystore "$serverAlias.p12" -keypass "$certPassword" -storepass "$certPassword" `
+    -ext "$altNameExtension" -keystore "$serverAlias.p12" -keypass "$certPassword" -storetype "$storeType" -storepass "$certPassword" `
     -deststoretype pkcs12
 
 echo "- Exporting Server Certificate Private Key..."
@@ -118,7 +117,7 @@ echo ""
 echo "Generating the Client Certificate..."
 echo "- Creating Key Pair"
 keytool -genkey -validity "$validity" -keysize "$keySize" -alias "$clientAlias" -keyalg RSA -dname "$clientDN" `
-    -keystore "$clientAlias.p12" -keypass "$certPassword" -storepass "$certPassword" -deststoretype pkcs12
+    -keystore "$clientAlias.p12" -keypass "$certPassword" -storetype "$storeType" -storepass "$certPassword" -deststoretype pkcs12
 
 echo "- Creating Certificate Signing Request"
 keytool -certreq -alias "$clientAlias" -keystore "$clientAlias.p12" -file "$clientAlias.csr" -keypass "$certPassword" `
@@ -140,7 +139,7 @@ rm "$clientAlias.csr"
 
 echo ""
 echo "Generating the Trust Store and put the Client Certificate in it..."
-keytool -importcert -alias "$authorityAlias" -file "$authorityAlias.cer" -keystore "$trustCertName.p12" `
+keytool -importcert -alias "$authorityAlias" -file "$authorityAlias.cer" -storetype "$storeType" -keystore "$trustCertName.p12" `
     -storepass "$certPassword" -noprompt
 
 echo ""

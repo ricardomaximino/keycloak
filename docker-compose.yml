@@ -1,15 +1,17 @@
 version: '3.8'
 
 services:
-  # mysql:
-  #   image: mysql:5.7
-  #   volumes:
-  #     - mysql_data:/var/lib/mysql
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: root
-  #     MYSQL_DATABASE: keycloak
-  #     MYSQL_USER: keycloak
-  #     MYSQL_PASSWORD: password
+  mysql:
+    image: mysql:8.0.19
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+    ports:
+      - 3306:3306
 
   keycloak:
     image: brasatech/keycloak:local
@@ -20,28 +22,24 @@ services:
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
-      # - X509_CA_BUNDLE: /etc/x509/https/rootCA.crt
-      # - KC_HOSTNAME=localhost:8443
-      # - KC_DB_URL=mysql
-      # - KC_DB_PORT=3306
-      # - KC_DB_DATABASE=keycloak
-      # - KC_DB_USER=keycloak
-      # - KC_DB_PASSWORD=password
-
-    command: start-dev
-    # command: start --https-certificate-file=/etc/x509/https/tls.crt --https-certificate-key-file=/certs/brasatech-server.key:/etc/x509/https/tls.key
-    # command: start --hostname=localhost --hostname-port=9090
-  
+      - KC_METRICS_ENABLED=true
+      - KC_FEATURES=token-exchange,docker,web-authn
+      - KC_HTTPS_TRUST_STORE_FILE=/opt/keycloak/conf/truststore.p12
+      - KC_HTTPS_TRUST_STORE_TYPE=PKCS12
+      - KC_HTTPS_TRUST_STORE_PASSWORD=changeit
+      - KC_HTTPS_KEY_STORE_FILE=/opt/keycloak/conf/brasatech-server.p12
+      - KC_HTTPS_KEY_STORE_TYPE=PKCS12
+      - KC_HTTPS_KEY_STORE_PASSWORD=changeit
+      - KC_HOSTNAME=localhost
+      - KC_HOSTNAME_PORT=9443
+      - KC_DB_URL_HOST=mysql
+      - KC_DB_USERNAME=keycloak
+      - KC_DB_PASSWORD=password
     ports:
-      - 8080:8080
       - 9443:8443
-    volumes:
-      - ./certs/brasatech-server.pem:/etc/x509/https/tls.crt
-      - ./certs/brasatech-server.key:/etc/x509/https/tls.key
-      # - ./certs/brasatech-root.cer:/etc/x509/https/rootCA.crt
-#     depends_on:
-#         - mysql
+    depends_on:
+        - mysql
 
-# volumes:
-#   mysql_data:
-#     name: mysql_data
+volumes:
+  mysql_data:
+    name: mysql_data
