@@ -25,7 +25,8 @@ $ca_country="ES"
 
 # Server Organizational Information #
 # Subject Alternative Name #
-$serverDNS="localhost"
+$serverDNS="brasatech.es"
+$altserverDNS="dns:brasatech.es,dns:*.brasatech.es,dns:localhost"
 $server_organizationalUnit="BrasaTech IT"
 $server_organization="BrasaTech Digital Solutions"
 $server_locality="Santa Pola"
@@ -46,7 +47,7 @@ $clientAlias="brasatech-client"
 
 # Extensions #
 $certAuthExtension="BasicConstraints:critical=ca:true,pathlen:10000"
-$altNameExtension="san=dns:$serverDNS"
+$altNameExtension="san=$altserverDNS"
 
 # Trust Store #
 $trustCertName="truststore"

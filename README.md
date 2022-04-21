@@ -15,6 +15,9 @@ https://www.youtube.com/watch?v=yq1hzNs1JQU
 # Create certificates with Keytool
 https://stackoverflow.com/questions/35947354/how-to-create-a-certificate-with-keytool
 
+# Keytool doc
+https://docs.oracle.com/en/java/javase/12/tools/keytool.html
+
 # http
 http://localhost:9090/
 

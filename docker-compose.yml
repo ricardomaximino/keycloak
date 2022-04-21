@@ -30,7 +30,7 @@ services:
       - KC_HTTPS_KEY_STORE_FILE=/opt/keycloak/conf/brasatech-server.p12
       - KC_HTTPS_KEY_STORE_TYPE=PKCS12
       - KC_HTTPS_KEY_STORE_PASSWORD=changeit
-      - KC_HOSTNAME=localhost
+      - KC_HOSTNAME=${HOST}
       - KC_HOSTNAME_PORT=9443
       - KC_DB_URL_HOST=mysql
       - KC_DB_USERNAME=keycloak
