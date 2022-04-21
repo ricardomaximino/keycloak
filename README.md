@@ -1,5 +1,6 @@
 # Keycloak
 https://www.youtube.com/watch?v=FyVHNJNriUQ
+
 # Keycloak repository
 https://github.com/keycloak/keycloak
 
@@ -8,6 +9,9 @@ https://github.com/keycloak/keycloak-containers
 
 # Keycloak for production
 https://www.keycloak.org/server/containers
+
+# Keycloak with springboot
+https://www.youtube.com/watch?v=TrASdBQu2_k
 
 # HTTPS and login with certificate
 https://www.youtube.com/watch?v=yq1hzNs1JQU
