@@ -1,4 +1,4 @@
-#
+#!/bin/bash
 #    This sample Windows PowerShell script will:
 #        1.) Create a Certificate Authority
 #        2.) Create a Server Certificate signed by the Certificate Authority
@@ -26,12 +26,22 @@ $ca_country="ES"
 # Server Organizational Information #
 # Subject Alternative Name #
 $serverDNS="brasatech.es"
-$altserverDNS="dns:brasatech.es,dns:*.brasatech.es,dns:localhost"
+$altserverDNS="dns:*.brasatech.es"
 $server_organizationalUnit="BrasaTech IT"
 $server_organization="BrasaTech Digital Solutions"
 $server_locality="Santa Pola"
 $server_state="Alicante"
 $server_country="ES"
+
+# Server Organizational Information #
+# Subject Alternative Name #
+$security_serverDNS="security.brasatech.es"
+$security_altserverDNS="dns:security.brasatech.es"
+$security_server_organizationalUnit="BrasaTech IT"
+$security_server_organization="BrasaTech Digital Solutions"
+$security_server_locality="Santa Pola"
+$security_server_state="Alicante"
+$security_server_country="ES"
 
 # Client Organizational Information #
 $client_organizationalUnit="BrasaTech IT"
@@ -43,11 +53,13 @@ $client_country="ES"
 # Certificate Alias #
 $authorityAlias="brasatech-root"
 $serverAlias="brasatech-server"
+$securityServerAlias="security-brasatech-server"
 $clientAlias="brasatech-client"
 
 # Extensions #
 $certAuthExtension="BasicConstraints:critical=ca:true,pathlen:10000"
 $altNameExtension="san=$altserverDNS"
+$securityAltNameExtension="san=$security_altserverDNS"
 
 # Trust Store #
 $trustCertName="truststore"
@@ -65,11 +77,13 @@ $certPassword="changeit"
 # ------------------------------------------------------------------------------------------ #
 
 $authorityDN="CN=$authorityAlias,OU=$ca_organizationalUnit,O=$ca_organization,L=$ca_locality,ST=$ca_state,C=$ca_country"
-$serverDN="CN=$serverDNS,OU=$server_organizationalUnit,O=$server_organization,L=$server_locality,ST=$server_state,C=$server_country"
+$serverDN="CN=$security_serverDNS,OU=$security_server_organizationalUnit,O=$security_server_organization,L=$security_server_locality,ST=$security_server_state,C=$security_server_country"
+$security_serverDN="CN=$serverDNS,OU=$server_organizationalUnit,O=$server_organization,L=$server_locality,ST=$server_state,C=$server_country"
 $clientDN="CN=$clientAlias,OU=$client_organizationalUnit,O=$client_organization,L=$client_locality,ST=$client_state,C=$client_country"
 
 rm "$authorityAlias.*"
 rm "$serverAlias.*"
+rm "$securityServerAlias.*"
 rm "$clientAlias.*"
 rm "$trustCertName.*"
 rm "$truststore.*"
@@ -115,6 +129,35 @@ rm "$serverAlias.csr"
 # rm "$serverAlias.pem"
 
 echo ""
+echo "Generating the Security Server Certificate..."
+echo "- Creating Key Pair"
+keytool -genkey -validity "$validity" -keysize "$keySize" -alias "$securityServerAlias" -keyalg RSA -dname "$security_serverDN" `
+    -ext "$securityAltNameExtension" -keystore "$securityServerAlias.p12" -keypass "$certPassword" -storetype "$storeType" -storepass "$certPassword" `
+    -deststoretype pkcs12
+
+echo "- Exporting Security Server Certificate Private Key..."
+keytool -exportcert -alias "$securityServerAlias" -file "$securityServerAlias.key" -keypass "$certPassword" `
+    -keystore "$securityServerAlias.p12" -storepass "$certPassword"    
+
+echo "- Creating Security Certificate Signing Request"
+keytool -certreq -alias "$securityServerAlias" -ext "$securityAltNameExtension" -keystore "$securityServerAlias.p12" -file "$securityServerAlias.csr" `
+    -keypass "$certPassword" -storepass "$certPassword"
+
+echo "- Signing Security Certificate"
+keytool -gencert -infile "$securityServerAlias.csr" -keystore "$authorityAlias.p12" -storepass "$certPassword" `
+    -alias "$authorityAlias" -ext "$securityAltNameExtension" -outfile "$securityServerAlias.pem"
+
+echo "- Adding Certificate Authority Certificate to Security Keystore"
+keytool -import -trustcacerts -alias "$authorityAlias" -file "$authorityAlias.cer" -keystore "$securityServerAlias.p12" `
+    -storepass "$certPassword" -noprompt
+
+echo "- Adding Security Certificate to Keystore"
+keytool -import -keystore "$securityServerAlias.p12" -file "$securityServerAlias.pem" -alias "$securityServerAlias" -keypass "$certPassword" `
+    -storepass "$certPassword" -noprompt
+rm "$securityServerAlias.csr"
+# rm "$securityServerAlias.pem"
+
+echo ""
 echo "Generating the Client Certificate..."
 echo "- Creating Key Pair"
 keytool -genkey -validity "$validity" -keysize "$keySize" -alias "$clientAlias" -keyalg RSA -dname "$clientDN" `
@@ -143,6 +186,6 @@ echo "Generating the Trust Store and put the Client Certificate in it..."
 keytool -importcert -alias "$authorityAlias" -file "$authorityAlias.cer" -storetype "$storeType" -keystore "$trustCertName.p12" `
     -storepass "$certPassword" -noprompt
 
-echo ""
-echo "Removing Public Key Files..."
+# echo ""
+# echo "Removing Public Key Files..."
 # rm "$authorityAlias.cer"
