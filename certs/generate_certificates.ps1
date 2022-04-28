@@ -1,4 +1,4 @@
-#!/bin/bash
+#
 #    This sample Windows PowerShell script will:
 #        1.) Create a Certificate Authority
 #        2.) Create a Server Certificate signed by the Certificate Authority
@@ -77,8 +77,8 @@ $certPassword="changeit"
 # ------------------------------------------------------------------------------------------ #
 
 $authorityDN="CN=$authorityAlias,OU=$ca_organizationalUnit,O=$ca_organization,L=$ca_locality,ST=$ca_state,C=$ca_country"
-$serverDN="CN=$security_serverDNS,OU=$security_server_organizationalUnit,O=$security_server_organization,L=$security_server_locality,ST=$security_server_state,C=$security_server_country"
-$security_serverDN="CN=$serverDNS,OU=$server_organizationalUnit,O=$server_organization,L=$server_locality,ST=$server_state,C=$server_country"
+$security_serverDN="CN=$security_serverDNS,OU=$security_server_organizationalUnit,O=$security_server_organization,L=$security_server_locality,ST=$security_server_state,C=$security_server_country"
+$serverDN="CN=$serverDNS,OU=$server_organizationalUnit,O=$server_organization,L=$server_locality,ST=$server_state,C=$server_country"
 $clientDN="CN=$clientAlias,OU=$client_organizationalUnit,O=$client_organization,L=$client_locality,ST=$client_state,C=$client_country"
 
 rm "$authorityAlias.*"
